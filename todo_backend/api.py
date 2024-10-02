@@ -1,17 +1,24 @@
 
-from fastapi import FastAPI
+from typing import List
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+
+from todo_backend.Todo import Todo
+from todo_backend.TodoRepository import TodoRepository
 
 app = FastAPI()
 
+repository = TodoRepository()
 
-todos = [
-        {"id": 1, "title": "Buy Milk", "description": "Buy Milk from the store"}, { "id": 2, "title": "Buy Bread", "description": "Buy Bread from the store"}
-    ]
 
 @app.get("/api/all-todos")
-async def read_root():
-    return todos
+async def read_root() -> List[Todo]:
+    return repository.get_all_todos()
 
 @app.get("/api/todo/{todo_id}")
-async def read_item(todo_id: int):
-    return todos[todo_id]
+async def read_item(todo_id: int) -> Todo:
+    todo = repository.get_todo_by_id(todo_id)
+    if todo is None:
+        raise HTTPException(status_code=404, detail="Todo not found")
+    return todo
+    
