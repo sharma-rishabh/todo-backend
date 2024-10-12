@@ -9,8 +9,19 @@ readme = "README.md"
 python = "^3.12"
 fastapi = "^0.115.0"
 uvicorn = "^0.31.0"
+pact-python = "^2.2.1"
 
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.3"
+black = "^24.8.0"
+pactman = "^2.31.0"
+pact-test = "^1.0.4"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.poetry.scripts]
+todo-backend = "todo_backend.__main__:start_server"
