@@ -1,24 +1,18 @@
-
-from typing import List
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-
-from todo_backend.Todo import Todo
-from todo_backend.TodoRepository import TodoRepository
+from fastapi import FastAPI
+from todo_backend.service import TodoService
+from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo.server_api import ServerApi
+from todo_backend.routes import get_router
+from todo_backend.repository import MetaInfoRepository, TodoMongoRepository
 
 app = FastAPI()
 
-repository = TodoRepository()
 
+uri = "mongodb://localhost:27017/"
+client = AsyncIOMotorClient(uri, server_api=ServerApi("1"))
+repo = TodoMongoRepository(client)
+meta_info_repo = MetaInfoRepository(client)
+service = TodoService(repo, meta_info_repo)
+router = get_router(service)
 
-@app.get("/api/all-todos")
-async def read_root() -> List[Todo]:
-    return repository.get_all_todos()
-
-@app.get("/api/todo/{todo_id}")
-async def read_item(todo_id: int) -> Todo:
-    todo = repository.get_todo_by_id(todo_id)
-    if todo is None:
-        raise HTTPException(status_code=404, detail="Todo not found")
-    return todo
-    
+app.include_router(router)
