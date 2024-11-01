@@ -64,3 +64,27 @@ class TodoService:
         task = todo.add_task(title)
         await self.repository.update(todo_id, todo)
         return task
+
+    async def toggle_completed(self, todo_id: int, task_id: int) -> Task:
+        todo = await self.get_todo_by_id(todo_id)
+        task = todo.toggle_completed(task_id)
+        await self.repository.update(todo_id, todo)
+        return task
+
+    async def edit_task_title(self, todo_id: int, task_id: int, title: str) -> Task:
+        todo = await self.get_todo_by_id(todo_id)
+        task = todo.update_task_title(task_id, title)
+        await self.repository.update(todo_id, todo)
+        return task
+
+    async def delete_task(self, todo_id: int, task_id: int) -> List[Task]:
+        todo = await self.get_todo_by_id(todo_id)
+        todo.delete_task(task_id)
+        await self.repository.update(todo_id, todo)
+        return todo.active_tasks()
+    
+    async def update_task_priority(self, todo_id: int, task_id: int, new_priority: int) -> List[Task]:
+        todo = await self.get_todo_by_id(todo_id)
+        todo.update_task_priority(task_id, new_priority)
+        await self.repository.update(todo_id, todo)
+        return todo.active_tasks()

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
 
 
-class AddTodoRequest(BaseModel):
+class TitleRequest(BaseModel):
     title: str
