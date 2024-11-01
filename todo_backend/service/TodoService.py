@@ -14,7 +14,7 @@ class TodoService:
 
     async def get_titles(self) -> List[Title]:
         res = await self.repository.get_all()
-        return [Todo.to_titles(todo) for todo in res]
+        return [Todo.to_titles(todo) for todo in res if not todo["deleted"]]
 
     async def get_meta_info(self) -> MetaInfo:
         raw_meta_info = await self.meta_info_repository.get_meta_info()
@@ -42,10 +42,21 @@ class TodoService:
         await self.meta_info_repository.update_meta_info(meta_info)
         return todo
 
+    async def edit_title(self, todo_id: int, title: str) -> Title:
+        todo = await self.get_todo_by_id(todo_id)
+        todo.title = title
+        await self.repository.update(todo_id, todo)
+        return Title(id=todo_id, title=title, priority=todo.priority)
+
+    async def delete_title(self, todo_id: int) -> List[Title]:
+        todo = await self.get_todo_by_id(todo_id)
+        todo.deleted = True
+        await self.repository.update(todo_id, todo)
+        return await self.get_titles()
+
     async def get_todo_by_id(self, todo_id: int) -> Todo:
         res = await self.repository.get_by_id(todo_id)
         serialized = Todo.serialize(res)
-        print(serialized)
         return serialized
 
     async def add_task(self, todo_id: int, title: str) -> Task:
