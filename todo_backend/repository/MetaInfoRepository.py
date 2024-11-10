@@ -11,8 +11,10 @@ class MetaInfoRepository:
     def insert(self, meta_info: MetaInfo):
         return self.collection.insert_one(meta_info.model_dump())
 
-    def get_meta_info(self) -> dict:
-        return self.collection.find_one()
+    def get_meta_info(self, user: str) -> dict:
+        return self.collection.find_one({"user": user})
 
     def update_meta_info(self, meta_info: MetaInfo):
-        return self.collection.replace_one({"id": 1}, meta_info.model_dump())
+        return self.collection.replace_one(
+            {"user": meta_info.user}, meta_info.model_dump()
+        )

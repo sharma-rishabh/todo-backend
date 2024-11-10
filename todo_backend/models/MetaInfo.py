@@ -2,6 +2,7 @@ from pydantic import BaseModel
 
 
 class MetaInfo(BaseModel):
+    user: str
     id: int = 1
     latest_todo_id: int = 0
     least_priority: int = 0
@@ -15,6 +16,7 @@ class MetaInfo(BaseModel):
     @staticmethod
     def serialize(obj: dict):
         return MetaInfo(
+            user=obj["user"],
             id=obj["id"],
             latest_todo_id=obj["latest_todo_id"],
             least_priority=obj["least_priority"],

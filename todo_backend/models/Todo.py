@@ -5,6 +5,7 @@ from todo_backend.models import Task
 
 
 class Todo(BaseModel):
+    user: str
     id: int
     title: str
     deleted: bool
@@ -77,6 +78,7 @@ class Todo(BaseModel):
     @staticmethod
     def serialize(obj: dict):
         return Todo(
+            user=obj["user"],
             id=obj["id"],
             title=obj["title"],
             deleted=obj["deleted"],
@@ -88,7 +90,9 @@ class Todo(BaseModel):
 
     @staticmethod
     def to_titles(obj: dict):
-        return Title(id=obj["id"], title=obj["title"], priority=obj["priority"])
+        return Title(
+            id=obj["id"], title=obj["title"], priority=obj["priority"], user=obj["user"]
+        )
 
 
 class Title(BaseModel):

@@ -57,7 +57,6 @@ def create_session(username: str) -> str:
 
 
 def get_user_from_session_id(request: Request) -> str:
-    print(request.headers)
     token = request.headers.get("Authorization")
 
     if not token:
@@ -69,7 +68,7 @@ def get_user_from_session_id(request: Request) -> str:
         ]
     except Exception as e:
         raise HTTPException(status_code=401, detail="Unauthorized")
-
+    print(sessions)
     return sessions[int(session_id)]
 
 
@@ -87,48 +86,71 @@ def get_router(todoService: TodoService) -> APIRouter:
     @router.get("/all-todos")
     async def all_todos(user: dict = Depends(get_user_from_session_id)) -> List[Title]:
         print("user", user)
-        return await todoService.get_titles()
+        return await todoService.get_titles(user)
 
     @router.post("/add-todo")
-    async def add_todo(title: TitleRequest) -> Title:
-        print("title", title)
-        return await todoService.add_todo(title.title)
+    async def add_todo(
+        title: TitleRequest, user: dict = Depends(get_user_from_session_id)
+    ) -> Title:
+        return await todoService.add_todo(title.title, user)
 
     @router.put("/edit-title/{todo_id}")
-    async def edit_title(todo_id: int, title: TitleRequest) -> Title:
-        return await todoService.edit_title(todo_id, title.title)
+    async def edit_title(
+        todo_id: int,
+        title: TitleRequest,
+        user: dict = Depends(get_user_from_session_id),
+    ) -> Title:
+        return await todoService.edit_title(todo_id, title.title, user)
 
     @router.put("/delete-title/{todo_id}")
-    async def delete_title(todo_id: int) -> List[Title]:
-        return await todoService.delete_title(todo_id)
+    async def delete_title(
+        todo_id: int, user: dict = Depends(get_user_from_session_id)
+    ) -> List[Title]:
+        return await todoService.delete_title(todo_id, user)
 
     @router.get("/todo/{todo_id}")
-    async def get_todo_by_id(todo_id: int) -> Todo:
-        return await todoService.get_todo_by_id(todo_id)
+    async def get_todo_by_id(
+        todo_id: int, user: dict = Depends(get_user_from_session_id)
+    ) -> Todo:
+        return await todoService.get_todo_by_id(todo_id, user)
 
     @router.put("/toggle-completed/{todoId}/{taskId}")
-    async def toggle_completed(todoId: int, taskId: int) -> Task:
-        return await todoService.toggle_completed(todoId, taskId)
+    async def toggle_completed(
+        todoId: int, taskId: int, user: dict = Depends(get_user_from_session_id)
+    ) -> Task:
+        return await todoService.toggle_completed(todoId, taskId, user)
 
     @router.post("/add-task/{todoId}")
-    async def toggle_completed(todoId: int, addTaskRequest: TitleRequest) -> Task:
-        return await todoService.add_task(todoId, addTaskRequest.title)
+    async def toggle_completed(
+        todoId: int,
+        addTaskRequest: TitleRequest,
+        user: dict = Depends(get_user_from_session_id),
+    ) -> Task:
+        return await todoService.add_task(todoId, addTaskRequest.title, user)
 
     @router.put("/edit-task-title/{todoId}/{taskId}")
-    async def edit_task_title(todoId: int, taskId: int, title: TitleRequest) -> Task:
-        return await todoService.edit_task_title(todoId, taskId, title.title)
+    async def edit_task_title(
+        todoId: int,
+        taskId: int,
+        title: TitleRequest,
+        user: dict = Depends(get_user_from_session_id),
+    ) -> Task:
+        return await todoService.edit_task_title(todoId, taskId, title.title, user)
 
     @router.put("/delete-task/{todoId}/{taskId}")
-    async def delete_task(todoId: int, taskId: int) -> List[Task]:
-        return await todoService.delete_task(todoId, taskId)
+    async def delete_task(
+        todoId: int, taskId: int, user: dict = Depends(get_user_from_session_id)
+    ) -> List[Task]:
+        return await todoService.delete_task(todoId, taskId, user)
 
     @router.put("/update-task-priority/{todoId}/{taskId}/{newPriority}")
     async def update_task_priority(
         todoId: int,
         taskId: int,
         newPriority: int,
+        user: dict = Depends(get_user_from_session_id),
     ) -> List[Task]:
-        return await todoService.update_task_priority(todoId, taskId, newPriority)
+        return await todoService.update_task_priority(todoId, taskId, newPriority, user)
 
     @router.get("/login")
     async def login(
