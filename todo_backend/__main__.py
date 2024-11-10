@@ -1,9 +1,10 @@
 import uvicorn
+from dotenv import load_dotenv
+
+load_dotenv("./.env")
 
 
 def start_server():
-    # print('Starting Server...')       
-
     uvicorn.run(
         "todo_backend.api:app",
         host="0.0.0.0",

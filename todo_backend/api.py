@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from todo_backend.service import TodoService
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.server_api import ServerApi
@@ -14,5 +15,4 @@ repo = TodoMongoRepository(client)
 meta_info_repo = MetaInfoRepository(client)
 service = TodoService(repo, meta_info_repo)
 router = get_router(service)
-
 app.include_router(router)
